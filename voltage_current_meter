@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Voltage & Current Meter (Supabase Connected)</title>
+  <style>
+    :root {
+      --bg:#0f1724;
+      --panel:#0b1220;
+      --accent:#60a5fa;
+      --text:#e6eef8;
+    }
+    body {
+      font-family:Inter,system-ui,Segoe UI,Helvetica,Arial;
+      background:linear-gradient(180deg,#071025 0%, #081827 60%);
+      color:var(--text);
+      margin:0; padding:24px;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      min-height:100vh;
+    }
+    .panel {
+      background:linear-gradient(180deg,var(--panel), #071020);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 8px 30px rgba(2,6,23,0.6);
+      width:100%;
+      max-width:900px;
+      height:auto;          /* shrink height */
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:20px;
+    }
+    .meters {
+      display:flex;
+      gap:50px;
+      justify-content:center;
+      align-items:flex-end;
+      flex-wrap:wrap;
+    }
+    .gauge { width:380px; max-width:44vw; height:220px; }
+    .gauge svg { width:100%; height:100%; overflow:visible }
+    .ticks { stroke:#6b7280; stroke-width:2 }
+    .tick-label { fill:#9fb4d8; font-size:12px }
+    .needle { stroke:var(--accent); stroke-width:3; stroke-linecap:round }
+    .hub { fill:var(--accent) }
+    .value-readout { font-weight:700; font-size:22px; text-align:center; margin-top:6px }
+    .meter-title { font-weight:700; font-size:16px; color:#cfe6ff; text-align:center }
+    footer { font-size:12px; color:#8ea9ce; text-align:center; margin-top:12px }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div style="text-align:center; margin-bottom:8px">
+      <div class="meter-title">Voltage & Current Meter</div>
+    </div>
+
+    <div class="meters">
+      <!-- Voltage Gauge -->
+      <div>
+        <div class="gauge" id="voltageGauge">
+          <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+            <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75" stroke-linecap="round"/>
+            <g id="voltageTicks" transform="translate(210,200) rotate(-90)"></g>
+            <g id="vNeedleGroup" transform="translate(210,200)">
+              <line id="vNeedle" x1="0" y1="0" x2="0" y2="-120" class="needle"/>
+              <circle cx="0" cy="0" r="8" class="hub" />
+            </g>
+            <text x="210" y="160" text-anchor="middle" font-size="14" fill="#cfe6ff">Voltage (V)</text>
+          </svg>
+        </div>
+        <div class="value-readout" id="vValue">0 V</div>
+      </div>
+
+      <!-- Current Gauge -->
+      <div>
+        <div class="gauge" id="currentGauge">
+          <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+            <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75" stroke-linecap="round"/>
+            <g id="currentTicks" transform="translate(210,200) rotate(-90)"></g>
+            <g id="iNeedleGroup" transform="translate(210,200)">
+              <line id="iNeedle" x1="0" y1="0" x2="0" y2="-120" class="needle"/>
+              <circle cx="0" cy="0" r="8" class="hub" />
+            </g>
+            <text x="210" y="160" text-anchor="middle" font-size="14" fill="#cfe6ff">Current (A)</text>
+          </svg>
+        </div>
+        <div class="value-readout" id="iValue">0 A</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Voltage & Current Meter — Supabase Live Data</footer>
+
+  <!-- Supabase client -->
+  <script src="https://unpkg.com/@supabase/supabase-js"></script>
+  <script>
+    // Supabase credentials
+    const SUPABASE_URL = "https://qliblvtrlkrznsrhqgne.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_0h-kh1qqKC2VJNht-XvTag_htW3z9o9";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let vMin=0, vMax=500, iMin=0, iMax=100;
+    let smoothing = 500;
+
+    // Convert value → angle
+    function valueToAngle(value, min, max){
+      const ratio = (value - min) / (max - min);
+      return -120 + ratio * 240;
+    }
+
+    // Draw ticks
+    function renderTicks(group, min, max, step){
+      group.innerHTML = '';
+      const total = Math.round((max - min) / step);
+      for (let i = 0; i <= total; i++) {
+        const val = min + i * step;
+        const ratio = (max - val) / (max - min);
+        const angleDeg = -120 + ratio * 240;
+        const angle = (Math.PI / 180) * angleDeg;
+
+        const rOuter = 170;
+        const rInner = (i % 5 === 0 ? 120 : 140);
+        const x1 = Math.cos(angle) * rInner;
+        const y1 = Math.sin(angle) * -rInner;
+        const x2 = Math.cos(angle) * rOuter;
+        const y2 = Math.sin(angle) * -rOuter;
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('class', 'ticks');
+        line.setAttribute('stroke-width', i % 5 === 0 ? 3 : 1.6);
+        group.appendChild(line);
+
+        if (i % 5 === 0) {
+          const tx = Math.cos(angle) * 100;
+          const ty = Math.sin(angle) * -100 + 6;
+          const tGroup = document.createElementNS('http://www.w3.org/2000/svg','g');
+          tGroup.setAttribute('transform', `rotate(${90}, ${tx+2}, ${ty-4})`);
+          const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+          text.setAttribute('x', tx);
+          text.setAttribute('y', ty);
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('dominant-baseline', 'middle');
+          text.setAttribute('class', 'tick-label');
+          text.textContent = val;
+          tGroup.appendChild(text);
+          group.appendChild(tGroup);
+        }
+
+      }
+    }
+
+    const vTicks = document.getElementById('voltageTicks');
+    const iTicks = document.getElementById('currentTicks');
+    renderTicks(vTicks, 0, 500, 20);
+    renderTicks(iTicks, 0, 100, 5);
+
+    const vValue = document.getElementById('vValue');
+    const iValue = document.getElementById('iValue');
+    const vNeedleGroup = document.getElementById('vNeedleGroup');
+    const iNeedleGroup = document.getElementById('iNeedleGroup');
+
+    function setNeedle(needleGroup, value, min, max){
+      const angle = valueToAngle(value,min,max);
+      needleGroup.style.transition = `transform ${smoothing}ms cubic-bezier(.2,.9,.3,1)`;
+      needleGroup.style.transform = `translate(210px,200px) rotate(${angle}deg)`;
+    }
+
+    function updateDisplays(voltage, current){
+      vValue.textContent = Number(voltage).toFixed(1) + ' V';
+      iValue.textContent = Number(current).toFixed(2) + ' A';
+      setNeedle(vNeedleGroup, voltage, vMin, vMax);
+      setNeedle(iNeedleGroup, current, iMin, iMax);
+    }
+
+    // Always fetch the row with largest id
+    async function fetchLatestReading() {
+      let { data, error } = await supabaseClient
+        .from("readings")
+        .select("id, voltage, current")
+        .order("id", { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error("Error fetching data:", error);
+        return;
+      }
+      if (data && data.length > 0) {
+        const { voltage, current } = data[0];
+        updateDisplays(voltage, current);
+      }
+    }
+
+    // Poll every 3s
+    setInterval(fetchLatestReading, 3000);
+
+    // Realtime updates (new insert = new largest id)
+    supabaseClient
+      .channel("readings-channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "readings" },
+        (payload) => {
+          const { voltage, current } = payload.new;
+          updateDisplays(voltage, current);
+        }
+      )
+      .subscribe();
+
+    // Initial load
+    fetchLatestReading();
+  </script>
+</body>
+</html>
