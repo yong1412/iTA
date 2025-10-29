@@ -18,7 +18,7 @@
       background: linear-gradient(180deg, #071025 0%, #081827 60%);
       color: var(--text);
       margin: 0;
-      padding: 24px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -26,7 +26,7 @@
       min-height: 100vh;
     }
 
-    /* ✅ Scale everything inside body by 1.2x */
+    /* ✅ Container scales everything by 1.2x */
     .scale-container {
       transform: scale(1.2);
       transform-origin: center center;
@@ -45,60 +45,6 @@
       gap: 20px;
     }
 
-    .meters {
-      display: flex;
-      gap: 50px;
-      justify-content: center;
-      align-items: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .gauge {
-      width: 380px;
-      max-width: 44vw;
-      height: 220px;
-    }
-
-    .gauge svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible
-    }
-
-    .ticks {
-      stroke: #6b7280;
-      stroke-width: 2
-    }
-
-    .tick-label {
-      fill: #9fb4d8;
-      font-size: 12px
-    }
-
-    .needle {
-      stroke: var(--accent);
-      stroke-width: 3;
-      stroke-linecap: round
-    }
-
-    .hub {
-      fill: var(--accent)
-    }
-
-    .value-readout {
-      font-weight: 700;
-      font-size: 22px;
-      text-align: center;
-      margin-top: 6px
-    }
-
-    .meter-title {
-      font-weight: 700;
-      font-size: 16px;
-      color: #cfe6ff;
-      text-align: center
-    }
-
     .logo-container {
       width: 100%;
       text-align: center;
@@ -113,11 +59,114 @@
       box-shadow: 0 6px 30px rgba(0, 0, 0, 0.45);
     }
 
+    .meter-title {
+      font-weight: 700;
+      font-size: 18px;
+      color: #cfe6ff;
+      text-align: center;
+    }
+
+    .meters {
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .gauge {
+      width: 380px;
+      max-width: 85vw;
+      height: auto;
+    }
+
+    .gauge svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .ticks {
+      stroke: #6b7280;
+      stroke-width: 2;
+    }
+
+    .tick-label {
+      fill: #9fb4d8;
+      font-size: 12px;
+    }
+
+    .needle {
+      stroke: var(--accent);
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .hub {
+      fill: var(--accent);
+    }
+
+    .value-readout {
+      font-weight: 700;
+      font-size: 22px;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    #toggleBtn {
+      padding: 12px 26px;
+      border: none;
+      border-radius: 10px;
+      background: #60a5fa;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #toggleBtn:hover {
+      opacity: 0.85;
+    }
+
     footer {
       font-size: 12px;
       color: #8ea9ce;
       text-align: center;
-      margin-top: 12px
+      margin-top: 12px;
+    }
+
+    /* 📱 Responsive for mobile */
+    @media (max-width: 600px) {
+      .scale-container {
+        transform: scale(1);
+      }
+
+      .panel {
+        padding: 12px;
+        gap: 16px;
+      }
+
+      .gauge {
+        width: 90vw;
+        max-width: 400px;
+      }
+
+      .meter-title {
+        font-size: 16px;
+      }
+
+      .value-readout {
+        font-size: 20px;
+      }
+
+      #toggleBtn {
+        width: 80%;
+        font-size: 16px;
+      }
+
+      footer {
+        font-size: 10px;
+      }
     }
   </style>
 </head>
@@ -125,8 +174,6 @@
 <body>
   <div class="scale-container">
     <div class="panel">
-
-      <!-- ✅ Bigger Logo -->
       <div class="logo-container">
         <img src="https://www.cckhrm.com.my/wp-content/uploads/2022/06/cropped-Logo.jpg" alt="Company Logo">
       </div>
@@ -136,10 +183,10 @@
       </div>
 
       <div class="meters">
-        <!-- Voltage Gauge -->
+        <!-- Voltage -->
         <div>
           <div class="gauge" id="voltageGauge">
-            <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 420 220">
               <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75"
                 stroke-linecap="round" />
               <g id="voltageTicks" transform="translate(210,200) rotate(-90)"></g>
@@ -153,10 +200,10 @@
           <div class="value-readout" id="vValue">0 V</div>
         </div>
 
-        <!-- Current Gauge -->
+        <!-- Current -->
         <div>
           <div class="gauge" id="currentGauge">
-            <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 420 220">
               <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75"
                 stroke-linecap="round" />
               <g id="currentTicks" transform="translate(210,200) rotate(-90)"></g>
@@ -171,19 +218,12 @@
         </div>
       </div>
 
-      <div style="margin-top:20px;">
-        <button id="toggleBtn" style="padding:10px 20px;border:none;border-radius:8px;
-           background:#60a5fa;color:white;font-size:16px;
-           cursor:pointer;">
-          Loading...
-        </button>
-      </div>
+      <button id="toggleBtn">Loading...</button>
     </div>
   </div>
 
   <footer>Voltage & Current Meter — Supabase Live Data</footer>
 
-  <!-- Supabase client -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <script>
     const SUPABASE_URL = "https://qliblvtrlkrznsrhqgne.supabase.co";
@@ -265,42 +305,29 @@
     }
 
     async function fetchLatestReading() {
-      let { data, error } = await supabaseClient
+      const { data } = await supabaseClient
         .from("readings")
         .select("id, voltage, current")
         .order("id", { ascending: false })
         .limit(1);
-
-      if (!error && data && data.length > 0) {
-        const { voltage, current } = data[0];
-        updateDisplays(voltage, current);
-      }
+      if (data && data.length) updateDisplays(data[0].voltage, data[0].current);
     }
 
     setInterval(fetchLatestReading, 3000);
 
-    supabaseClient
-      .channel("readings-channel")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "readings" },
-        (payload) => {
-          const { voltage, current } = payload.new;
-          updateDisplays(voltage, current);
-        }
-      )
+    supabaseClient.channel("readings-channel")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "readings" },
+        (payload) => updateDisplays(payload.new.voltage, payload.new.current))
       .subscribe();
 
     const toggleBtn = document.getElementById('toggleBtn');
-
     async function fetchButtonState() {
-      const { data, error } = await supabaseClient
+      const { data } = await supabaseClient
         .from('button_state')
         .select('id, state')
         .order('id', { ascending: false })
         .limit(1);
-
-      if (!error && data && data.length > 0) {
+      if (data && data.length) {
         const { id, state } = data[0];
         toggleBtn.textContent = state ? 'Turn OFF' : 'Turn ON';
         toggleBtn.dataset.rowId = id;
@@ -312,21 +339,15 @@
     toggleBtn.addEventListener('click', async () => {
       const newState = !(toggleBtn.dataset.state === 'true');
       const rowId = toggleBtn.dataset.rowId;
-      const { error } = await supabaseClient
+      await supabaseClient
         .from('button_state')
         .update({ state: newState, updated_at: new Date().toISOString() })
         .eq('id', rowId);
-
-      if (!error) fetchButtonState();
+      fetchButtonState();
     });
 
-    supabaseClient
-      .channel('button-channel')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'button_state' },
-        fetchButtonState
-      )
+    supabaseClient.channel('button-channel')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'button_state' }, fetchButtonState)
       .subscribe();
 
     fetchLatestReading();
