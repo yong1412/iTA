@@ -26,6 +26,12 @@
       min-height: 100vh;
     }
 
+    /* ✅ Scale everything inside body by 1.2x */
+    .scale-container {
+      transform: scale(1.2);
+      transform-origin: center center;
+    }
+
     .panel {
       background: linear-gradient(180deg, var(--panel), #071020);
       border-radius: 18px;
@@ -33,8 +39,6 @@
       box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
       width: 100%;
       max-width: 900px;
-      height: auto;
-      /* shrink height */
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -119,87 +123,81 @@
 </head>
 
 <body>
-  <div class="panel">
+  <div class="scale-container">
+    <div class="panel">
 
-    <!-- ✅ Bigger Logo -->
-    <div class="logo-container">
-      <img src="https://www.cckhrm.com.my/wp-content/uploads/2022/06/cropped-Logo.jpg" alt="Company Logo">
-    </div>
-
-    <div style="text-align:center; margin-bottom:8px">
-      <div class="meter-title">Voltage & Current Meter</div>
-    </div>
-
-    <div class="meters">
-      <!-- Voltage Gauge -->
-      <div>
-        <div class="gauge" id="voltageGauge">
-          <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
-            <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75"
-              stroke-linecap="round" />
-            <g id="voltageTicks" transform="translate(210,200) rotate(-90)"></g>
-            <g id="vNeedleGroup" transform="translate(210,200)">
-              <line id="vNeedle" x1="0" y1="0" x2="0" y2="-120" class="needle" />
-              <circle cx="0" cy="0" r="8" class="hub" />
-            </g>
-            <text x="210" y="160" text-anchor="middle" font-size="14" fill="#cfe6ff">Voltage (V)</text>
-          </svg>
-        </div>
-        <div class="value-readout" id="vValue">0 V</div>
+      <!-- ✅ Bigger Logo -->
+      <div class="logo-container">
+        <img src="https://www.cckhrm.com.my/wp-content/uploads/2022/06/cropped-Logo.jpg" alt="Company Logo">
       </div>
 
-      <!-- Current Gauge -->
-      <div>
-        <div class="gauge" id="currentGauge">
-          <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
-            <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75"
-              stroke-linecap="round" />
-            <g id="currentTicks" transform="translate(210,200) rotate(-90)"></g>
-            <g id="iNeedleGroup" transform="translate(210,200)">
-              <line id="iNeedle" x1="0" y1="0" x2="0" y2="-120" class="needle" />
-              <circle cx="0" cy="0" r="8" class="hub" />
-            </g>
-            <text x="210" y="160" text-anchor="middle" font-size="14" fill="#cfe6ff">Current (A)</text>
-          </svg>
-        </div>
-        <div class="value-readout" id="iValue">0 A</div>
+      <div style="text-align:center; margin-bottom:8px">
+        <div class="meter-title">Voltage & Current Meter</div>
       </div>
-    </div>
 
-    <div style="margin-top:20px;">
-      <button id="toggleBtn" style="padding:10px 20px;border:none;border-radius:8px;
+      <div class="meters">
+        <!-- Voltage Gauge -->
+        <div>
+          <div class="gauge" id="voltageGauge">
+            <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+              <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75"
+                stroke-linecap="round" />
+              <g id="voltageTicks" transform="translate(210,200) rotate(-90)"></g>
+              <g id="vNeedleGroup" transform="translate(210,200)">
+                <line id="vNeedle" x1="0" y1="0" x2="0" y2="-120" class="needle" />
+                <circle cx="0" cy="0" r="8" class="hub" />
+              </g>
+              <text x="210" y="160" text-anchor="middle" font-size="14" fill="#cfe6ff">Voltage (V)</text>
+            </svg>
+          </div>
+          <div class="value-readout" id="vValue">0 V</div>
+        </div>
+
+        <!-- Current Gauge -->
+        <div>
+          <div class="gauge" id="currentGauge">
+            <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+              <path d="M80 270 A150 140 0 1 1 340 270" fill="none" stroke="#07182a" stroke-width="75"
+                stroke-linecap="round" />
+              <g id="currentTicks" transform="translate(210,200) rotate(-90)"></g>
+              <g id="iNeedleGroup" transform="translate(210,200)">
+                <line id="iNeedle" x1="0" y1="0" x2="0" y2="-120" class="needle" />
+                <circle cx="0" cy="0" r="8" class="hub" />
+              </g>
+              <text x="210" y="160" text-anchor="middle" font-size="14" fill="#cfe6ff">Current (A)</text>
+            </svg>
+          </div>
+          <div class="value-readout" id="iValue">0 A</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;">
+        <button id="toggleBtn" style="padding:10px 20px;border:none;border-radius:8px;
            background:#60a5fa;color:white;font-size:16px;
            cursor:pointer;">
-        Loading...
-      </button>
+          Loading...
+        </button>
+      </div>
     </div>
-
-
   </div>
-
-
 
   <footer>Voltage & Current Meter — Supabase Live Data</footer>
 
   <!-- Supabase client -->
   <script src="https://unpkg.com/@supabase/supabase-js"></script>
   <script>
-    // Supabase credentials
     const SUPABASE_URL = "https://qliblvtrlkrznsrhqgne.supabase.co";
     const SUPABASE_KEY = "sb_publishable_0h-kh1qqKC2VJNht-XvTag_htW3z9o9";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Gauge settings
     let vMin = 0, vMax = 300, iMin = 0, iMax = 50;
     let smoothing = 500;
 
-    // Convert value → angle
     function valueToAngle(value, min, max) {
       const ratio = (value - min) / (max - min);
       return -120 + ratio * 240;
     }
 
-    // Draw gauge ticks
     function renderTicks(group, min, max, step) {
       group.innerHTML = '';
       const total = Math.round((max - min) / step);
@@ -266,7 +264,6 @@
       setNeedle(iNeedleGroup, current, iMin, iMax);
     }
 
-    // Fetch latest voltage/current
     async function fetchLatestReading() {
       let { data, error } = await supabaseClient
         .from("readings")
@@ -280,10 +277,8 @@
       }
     }
 
-    // Poll every 3s
     setInterval(fetchLatestReading, 3000);
 
-    // Realtime updates (new insert)
     supabaseClient
       .channel("readings-channel")
       .on(
@@ -296,9 +291,6 @@
       )
       .subscribe();
 
-    // ===============================
-    // 🔘 Button ON/OFF Logic
-    // ===============================
     const toggleBtn = document.getElementById('toggleBtn');
 
     async function fetchButtonState() {
@@ -328,7 +320,6 @@
       if (!error) fetchButtonState();
     });
 
-    // Realtime updates for button
     supabaseClient
       .channel('button-channel')
       .on(
@@ -338,11 +329,8 @@
       )
       .subscribe();
 
-    // Initial load
     fetchLatestReading();
     fetchButtonState();
   </script>
-
 </body>
-
 </html>
