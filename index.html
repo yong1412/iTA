@@ -348,10 +348,10 @@
 
       if (!error && data && data.length > 0) {
         const { id, state } = data[0];
-        toggleBtn.textContent = state ? 'Turn OFF' : 'Turn ON';
+        toggleBtn.textContent = state ? 'Turn ON' : 'Turn OFF';
         toggleBtn.dataset.rowId = id;
         toggleBtn.dataset.state = state;
-        toggleBtn.style.background = state ? '#ef4444' : '#60a5fa';
+        toggleBtn.style.background = state ? '#60a5fa' : '#ef4444';
       }
     }
 
